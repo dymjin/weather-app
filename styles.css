@@ -23,3 +23,7 @@ body {
   transition: all 200ms ease-in-out;
   font-size: 2rem;
 }
+
+i.hidden {
+  display: none;
+}

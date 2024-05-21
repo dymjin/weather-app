@@ -5,19 +5,37 @@ async function queryWeather(location) {
   //   );
   //   const weatherData = await response.json();
   //   return weatherData;
-  // const processedWeatherData = {
-  //   name: weatherData.location.name,
-  //   temp_c: weatherData.current.temp_c,
-  //   temp_f: weatherData.current.temp_f,
-  //   wind_kph: weatherData.current.wind_kph,
-  //   wind_mph: weatherData.current.wind_mph,
-  //   wind_dir: weatherData.current.wind_dir,
-  //   humidity: weatherData.current.humidity,
-  //   condition: weatherData.current.condition.text,
-  //   localTime: weatherData.location.localTime
-  // };
   // return processedWeatherData;
 }
+
+function autoCompleteSearch() {
+  const search = document.getElementById("location-search");
+  const locationsList = document.getElementById("locations");
+  const searchbarContainer = document.querySelector(".searchbar-container");
+  const loadingIcon = document.getElementById("location-loading");
+  search.addEventListener("input", async () => {
+    loadingIcon.classList.remove("hidden");
+    const response = await fetch(
+      `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
+        search.value || "undefined"
+      }`,
+      { mode: "cors" }
+    );
+    const locationData = await response.json();
+    loadingIcon.classList.add("hidden");
+    if (locationData.length) {
+      locationData.forEach((location) => {
+        const locationOption = document.createElement("option");
+        locationOption.value = `${location.name}, ${
+          location?.region ? `${location.region}, ` : ""
+        }${location.country}`;
+        locationsList.appendChild(locationOption);
+      });
+    }
+    return locationData;
+  });
+}
+autoCompleteSearch();
 
 function timeToRGB(time = new Date()) {
   const timeInRGB = Math.round(
@@ -65,23 +83,23 @@ function changeTempColor(temp = 0) {
   // )}, 0), transparent), radial-gradient(ellipse at bottom, blue, transparent) black`;
 }
 
-const slider = document.getElementById("gradient");
-slider.addEventListener("input", () => {
-  // changeBGColor(
-  //   new Date(
-  //     `${new Date().getFullYear()}T${
-  //       slider.value < 10 ? `0${slider.value}` : slider.value
-  //     }:00`
-  //   )
-  // );
-  // rotateSun(
-  //   new Date(
-  //     `${new Date().getFullYear()}T${
-  //       slider.value < 10 ? `0${slider.value}` : slider.value
-  //     }:00`
-  //   )
-  // );
-});
+// const slider = document.getElementById("gradient");
+// slider.addEventListener("input", () => {
+//   // changeBGColor(
+//   //   new Date(
+//   //     `${new Date().getFullYear()}T${
+//   //       slider.value < 10 ? `0${slider.value}` : slider.value
+//   //     }:00`
+//   //   )
+//   // );
+//   // rotateSun(
+//   //   new Date(
+//   //     `${new Date().getFullYear()}T${
+//   //       slider.value < 10 ? `0${slider.value}` : slider.value
+//   //     }:00`
+//   //   )
+//   // );
+// });
 
 // rotateSun(new Date());
 // changeBGColor(new Date());
