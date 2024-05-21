@@ -8,12 +8,30 @@ async function queryWeather(location) {
   // return processedWeatherData;
 }
 
+function createElement({
+  classlist,
+  type = "div",
+  parent = document.body,
+  attributes = [],
+} = {}) {
+  const elem = document.createElement(type);
+  classlist ? (elem.className = classlist) : null;
+  attributes.length
+    ? elem.setAttribute(attributes[0]?.name, attributes[0]?.value)
+    : null;
+  parent.appendChild(elem);
+  return elem;
+}
+
 function autoCompleteSearch() {
   const search = document.getElementById("location-search");
   const locationsList = document.getElementById("locations");
   const searchbarContainer = document.querySelector(".searchbar-container");
   const loadingIcon = document.getElementById("location-loading");
   search.addEventListener("input", async () => {
+    while (locationsList.firstChild) {
+      locationsList.removeChild(locationsList.firstChild);
+    }
     loadingIcon.classList.remove("hidden");
     const response = await fetch(
       `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
@@ -25,17 +43,18 @@ function autoCompleteSearch() {
     loadingIcon.classList.add("hidden");
     if (locationData.length) {
       locationData.forEach((location) => {
-        const locationOption = document.createElement("option");
+        const locationOption = createElement({
+          type: "option",
+          parent: locationsList,
+        });
         locationOption.value = `${location.name}, ${
           location?.region ? `${location.region}, ` : ""
         }${location.country}`;
-        locationsList.appendChild(locationOption);
       });
     }
     return locationData;
   });
 }
-autoCompleteSearch();
 
 function timeToRGB(time = new Date()) {
   const timeInRGB = Math.round(
