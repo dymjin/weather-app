@@ -1,11 +1,11 @@
 async function queryWeather(location) {
-  //   const response = await fetch(
-  //     "http://api.weatherapi.com/v1/current.json?key=642ff04962c74e13ade91014240305&q=London&aqi=no",
-  //     { mode: "cors" }
-  //   );
-  //   const weatherData = await response.json();
-  //   return weatherData;
-  // return processedWeatherData;
+  const response = await fetch(
+    `http://api.weatherapi.com/v1/current.json?key=642ff04962c74e13ade91014240305&q=${location}&aqi=no`,
+    { mode: "cors" }
+  );
+  const weatherData = await response.json();
+  console.log(weatherData);
+  return weatherData;
 }
 
 function createElement({
@@ -26,8 +26,13 @@ function createElement({
 function autoCompleteSearch() {
   const search = document.getElementById("location-search");
   const locationsList = document.getElementById("locations");
-  const searchbarContainer = document.querySelector(".searchbar-container");
   const loadingIcon = document.getElementById("location-loading");
+  search.addEventListener("blur", () => {
+    locationsList.style.display = "none";
+  });
+  search.addEventListener("focus", () => {
+    locationsList.style.display = "flex";
+  });
   search.addEventListener("input", async () => {
     while (locationsList.firstChild) {
       locationsList.removeChild(locationsList.firstChild);
@@ -44,17 +49,21 @@ function autoCompleteSearch() {
     if (locationData.length) {
       locationData.forEach((location) => {
         const locationOption = createElement({
-          type: "option",
+          type: "span",
           parent: locationsList,
         });
-        locationOption.value = `${location.name}, ${
+        locationOption.textContent = `${location.name}, ${
           location?.region ? `${location.region}, ` : ""
         }${location.country}`;
+        locationOption.addEventListener("mousedown", () => {
+          queryWeather(location.name);
+        });
       });
     }
     return locationData;
   });
 }
+autoCompleteSearch();
 
 function timeToRGB(time = new Date()) {
   const timeInRGB = Math.round(

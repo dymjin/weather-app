@@ -27,3 +27,19 @@ body {
 i.hidden {
   display: none;
 }
+
+#location-search {
+  position: relative;
+}
+
+#locations {
+  position: absolute;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+#locations > span:hover {
+  background-color: blue;
+  cursor: pointer;
+}
