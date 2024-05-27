@@ -43,3 +43,7 @@ i.hidden {
   background-color: blue;
   cursor: pointer;
 }
+
+.hidden {
+  display: none;
+}

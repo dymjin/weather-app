@@ -1,10 +1,18 @@
-async function queryWeather(location) {
+async function queryWeatherCurrent(location) {
   const response = await fetch(
     `http://api.weatherapi.com/v1/current.json?key=642ff04962c74e13ade91014240305&q=${location}&aqi=no`,
     { mode: "cors" }
   );
   const weatherData = await response.json();
-  console.log(weatherData);
+  return weatherData;
+}
+
+async function queryWeatherForecast(location) {
+  const response = await fetch(
+    `http://api.weatherapi.com/v1/forecast.json?key=642ff04962c74e13ade91014240305&q=${location}&days=3&aqi=no&alerts=no`,
+    { mode: "cors" }
+  );
+  const weatherData = await response.json();
   return weatherData;
 }
 
@@ -17,10 +25,158 @@ function createElement({
   const elem = document.createElement(type);
   classlist ? (elem.className = classlist) : null;
   attributes.length
-    ? elem.setAttribute(attributes[0]?.name, attributes[0]?.value)
+    ? attributes.forEach((attr) => {
+        elem.setAttribute(attr?.name, attr?.value);
+      })
     : null;
   parent.appendChild(elem);
   return elem;
+}
+
+function initWeatherDOM(data) {
+  const weatherDaysContainer = document.querySelector(
+    ".weather-days-container"
+  );
+  while (weatherDaysContainer.firstChild) {
+    weatherDaysContainer.removeChild(weatherDaysContainer.firstChild);
+  }
+  data.forecast.forecastday.forEach((forecastDay, index) => {
+    addWeatherDetailsDOM({
+      weatherData: data,
+      index,
+      date: new Date(forecastDay.date),
+    });
+  });
+}
+
+function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
+  // console.log(weatherData);
+  const dayData = weatherData.forecast.forecastday[index].day;
+  const weatherDetails = (({
+    mintemp_c,
+    maxtemp_c,
+    avgtemp_c,
+    maxwind_kph,
+    condition,
+  }) => ({
+    mintemp: {
+      value: mintemp_c,
+      text: "Min Temp",
+    },
+    maxtemp: {
+      value: maxtemp_c,
+      text: "Max Temp",
+    },
+    avgtemp: {
+      value: avgtemp_c,
+      text: "Avg Temp",
+      icon: "temperature-quarter",
+    },
+    windspeed: { value: maxwind_kph, text: "Wind Speed" },
+    condition: { value: condition.text, text: "Condition" },
+  }))(dayData);
+  // console.log(extractedData);
+
+  const date = new Date(weatherData.forecast.forecastday[index].date);
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const weatherDays = document.querySelector(".weather-days-container");
+  const dayContainer = createElement({
+    classlist: "weather-day-container",
+    type: "div",
+    parent: weatherDays,
+    attributes: [{ name: "data", value: index }],
+  });
+
+  const elemDetails = createElement({
+    classlist: "day-details-container",
+    parent: dayContainer,
+  });
+  dayContainer.addEventListener("click", () => {
+    elemDetails.classList.toggle("hidden");
+  });
+  // const dayTitle = createElement({
+  //   classlist: "day-title",
+  //   type: "h1",
+  //   parent: dayContainer,
+  // });
+  // const conditionIcon = createElement({
+  //   classlist: "day-display-condition-img",
+  //   type: "img",
+  //   attributes: [{ name: "src", value: dayData.condition.icon }],
+  //   parent: dayContainer,
+  // });
+  // const conditionText = createElement({
+  //   classlist: "day-display-condition-text",
+  //   parent: dayContainer,
+  // });
+  // conditionText.textContent = dayData.condition.text;
+  // const tempsContainer = createElement({
+  //   classlist: "day-display-temp-container",
+  //   parent: dayContainer,
+  // });
+  // const currTemp = createElement({
+  //   classlist: "day-display-hourly-temp",
+  //   parent: dayContainer,
+  // });
+  // currTemp.textContent = `${weatherData.current.temp_c}°C`;
+  // const minmaxTemp = createElement({
+  //   classlist: "day-display-minxmax-temp",
+  //   parent: tempsContainer,
+  // });
+  // minmaxTemp.textContent = `${dayData.mintemp_c}°C / ${dayData.maxtemp_c}°C`;
+  // const rainContainer = createElement({
+  //   classlist: "day-display-rain-container",
+  //   parent: dayContainer,
+  // });
+  // const rainIcon = createElement({
+  //   classlist: "fa-solid fa-cloud-rain rain-icon",
+  //   parent: rainContainer,
+  // });
+  // const rainChance = createElement({
+  //   classlist: "day-display-rain-chance",
+  //   parent: rainContainer,
+  // });
+  // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
+  // dayTitle.textContent = days[date.getDay()];
+  Object.entries(weatherDetails).forEach((prop) => {
+    const propClassName = prop[0].toLowerCase();
+    const elemContainer = createElement({
+      classlist: `${propClassName}-container`,
+      parent: dayContainer,
+    });
+    const elemTitleWrapper = createElement({
+      classlist: `${propClassName}-title-wrapper`,
+      parent: elemContainer,
+    });
+    const elemIcon = createElement({
+      classlist: `${propClassName}-icon fa-solid fa-${prop[1].icon}`,
+      type: "i",
+      parent: elemTitleWrapper,
+    });
+    const elemTitle = createElement({
+      classlist: `${propClassName}-title`,
+      parent: elemTitleWrapper,
+    });
+    elemTitle.textContent = prop[1].text;
+    const elemValue = createElement({
+      classlist: propClassName,
+      type: prop[1].type || "div",
+      parent: elemContainer,
+      attributes: prop[1].attributes || [],
+    });
+    elemValue.textContent = prop[1].value;
+    elemDetails.appendChild(elemContainer);
+    elemDetails.classList.add("hidden");
+  });
+  dayContainer.appendChild(elemDetails);
 }
 
 function autoCompleteSearch() {
@@ -34,9 +190,6 @@ function autoCompleteSearch() {
     locationsList.style.display = "flex";
   });
   search.addEventListener("input", async () => {
-    while (locationsList.firstChild) {
-      locationsList.removeChild(locationsList.firstChild);
-    }
     loadingIcon.classList.remove("hidden");
     const response = await fetch(
       `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
@@ -45,22 +198,37 @@ function autoCompleteSearch() {
       { mode: "cors" }
     );
     const locationData = await response.json();
+    while (locationsList.firstChild) {
+      locationsList.removeChild(locationsList.firstChild);
+    }
     loadingIcon.classList.add("hidden");
     if (locationData.length) {
       locationData.forEach((location) => {
-        const locationOption = createElement({
-          type: "span",
-          parent: locationsList,
-        });
-        locationOption.textContent = `${location.name}, ${
-          location?.region ? `${location.region}, ` : ""
-        }${location.country}`;
-        locationOption.addEventListener("mousedown", () => {
-          queryWeather(location.name);
-        });
+        if (
+          location.name
+            .toLowerCase()
+            .replaceAll(" ", "")
+            .match(search.value.toLowerCase().replaceAll(" ", ""))
+        ) {
+          const locationOption = createElement({
+            type: "span",
+            parent: locationsList,
+          });
+          locationOption.textContent = `${location.name}, ${
+            location?.region ? `${location.region}, ` : ""
+          }${location.country}`;
+
+          locationOption.addEventListener("mousedown", async () => {
+            // console.log(location);
+            search.value = location.name;
+            const weatherForecastData = await queryWeatherForecast(
+              location.name
+            );
+            initWeatherDOM(await weatherForecastData);
+          });
+        }
       });
     }
-    return locationData;
   });
 }
 autoCompleteSearch();
