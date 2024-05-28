@@ -21,6 +21,9 @@ function createElement({
   type = "div",
   parent = document.body,
   attributes = [],
+  childElems = [],
+  text = "",
+  name = "",
 } = {}) {
   const elem = document.createElement(type);
   classlist ? (elem.className = classlist) : null;
@@ -30,6 +33,13 @@ function createElement({
       })
     : null;
   parent.appendChild(elem);
+  text ? (elem.textContent = text) : null;
+  if (childElems) {
+    childElems.forEach((child) => {
+      const childElem = createElement(child);
+      elem.appendChild(childElem);
+    });
+  }
   return elem;
 }
 
@@ -77,31 +87,18 @@ function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
   }))(dayData);
   // console.log(extractedData);
 
-  const date = new Date(weatherData.forecast.forecastday[index].date);
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  // const date = new Date(weatherData.forecast.forecastday[index].date);
+  // const days = [
+  //   "Sunday",
+  //   "Monday",
+  //   "Tuesday",
+  //   "Wednesday",
+  //   "Thursday",
+  //   "Friday",
+  //   "Saturday",
+  // ];
   const weatherDays = document.querySelector(".weather-days-container");
-  const dayContainer = createElement({
-    classlist: "weather-day-container",
-    type: "div",
-    parent: weatherDays,
-    attributes: [{ name: "data", value: index }],
-  });
 
-  const elemDetails = createElement({
-    classlist: "day-details-container",
-    parent: dayContainer,
-  });
-  dayContainer.addEventListener("click", () => {
-    elemDetails.classList.toggle("hidden");
-  });
   // const dayTitle = createElement({
   //   classlist: "day-title",
   //   type: "h1",
@@ -146,40 +143,53 @@ function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
   // });
   // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
   // dayTitle.textContent = days[date.getDay()];
+  const dayContainer = createElement({
+    classlist: "weather-day-container",
+    type: "div",
+    parent: weatherDays,
+    attributes: [{ name: "data", value: index }],
+    childElems: [
+      {
+        name: "elem-details-container",
+        classlist: "day-details-container hidden",
+        attributes: [{ name: "data", value: index }],
+      },
+    ],
+  });
+  dayContainer.addEventListener("click", () => {
+    dayContainer.lastElementChild.toggle("hidden");
+  });
   Object.entries(weatherDetails).forEach((prop) => {
+    console.log(prop);
     const propClassName = prop[0].toLowerCase();
     const elemContainer = createElement({
+      name: "elem-container",
       classlist: `${propClassName}-container`,
-      parent: dayContainer,
+      parent: document.querySelector(`.day-details-container[data="${index}"]`),
+      childElems: [
+        {
+          name: "elem-title-wrapper",
+          classlist: `${propClassName}-title-wrapper`,
+          childElems: [
+            {
+              name: "elem-icon",
+              classlist: `${propClassName}-icon fa-solid fa-${prop[1].icon}`,
+              type: "i",
+            },
+            {
+              name: "elem-title",
+              classlist: `${propClassName}-title`,
+              text: prop[1].text,
+            },
+          ],
+        },
+        { name: "elem-value", classlist: propClassName, text: prop[1].value },
+      ],
     });
-    const elemTitleWrapper = createElement({
-      classlist: `${propClassName}-title-wrapper`,
-      parent: elemContainer,
-    });
-    const elemIcon = createElement({
-      classlist: `${propClassName}-icon fa-solid fa-${prop[1].icon}`,
-      type: "i",
-      parent: elemTitleWrapper,
-    });
-    const elemTitle = createElement({
-      classlist: `${propClassName}-title`,
-      parent: elemTitleWrapper,
-    });
-    elemTitle.textContent = prop[1].text;
-    const elemValue = createElement({
-      classlist: propClassName,
-      type: prop[1].type || "div",
-      parent: elemContainer,
-      attributes: prop[1].attributes || [],
-    });
-    elemValue.textContent = prop[1].value;
-    elemDetails.appendChild(elemContainer);
-    elemDetails.classList.add("hidden");
   });
-  dayContainer.appendChild(elemDetails);
 }
 
-function autoCompleteSearch() {
+function initSearch() {
   const search = document.getElementById("location-search");
   const locationsList = document.getElementById("locations");
   const loadingIcon = document.getElementById("location-loading");
@@ -231,7 +241,7 @@ function autoCompleteSearch() {
     }
   });
 }
-autoCompleteSearch();
+initSearch();
 
 function timeToRGB(time = new Date()) {
   const timeInRGB = Math.round(
