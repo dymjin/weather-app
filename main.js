@@ -43,49 +43,102 @@ function createElement({
   return elem;
 }
 
-function initWeatherDOM(data) {
-  const weatherDaysContainer = document.querySelector(
-    ".weather-days-container"
-  );
-  while (weatherDaysContainer.firstChild) {
-    weatherDaysContainer.removeChild(weatherDaysContainer.firstChild);
-  }
-  data.forecast.forecastday.forEach((forecastDay, index) => {
-    addWeatherDetailsDOM({
-      weatherData: data,
-      index,
-      date: new Date(forecastDay.date),
-    });
-  });
-}
-
-function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
-  // console.log(weatherData);
-  const dayData = weatherData.forecast.forecastday[index].day;
+function weatherDetailsHandler(data, index) {
+  const dayData = data.forecast.forecastday[index].day;
   const weatherDetails = (({
     mintemp_c,
+    mintemp_f,
     maxtemp_c,
+    maxtemp_f,
     avgtemp_c,
+    avgtemp_f,
     maxwind_kph,
+    maxwind_mph,
     condition,
   }) => ({
     mintemp: {
       value: mintemp_c,
+      alt: mintemp_f,
       text: "Min Temp",
     },
     maxtemp: {
       value: maxtemp_c,
+      alt: maxtemp_f,
       text: "Max Temp",
     },
     avgtemp: {
       value: avgtemp_c,
+      alt: avgtemp_f,
       text: "Avg Temp",
       icon: "temperature-quarter",
     },
-    windspeed: { value: maxwind_kph, text: "Wind Speed" },
+    windspeed: { value: maxwind_kph, alt: maxwind_mph, text: "Wind Speed" },
     condition: { value: condition.text, text: "Condition" },
   }))(dayData);
-  // console.log(extractedData);
+  return weatherDetails;
+}
+
+function removeElement(elem) {
+  if (elem) {
+    elem.parentElement.removeChild(elem);
+  }
+}
+
+function removeChildren(container) {
+  if (container) {
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+  }
+}
+
+function initWeatherDOM(data) {
+  const weatherDays = document.querySelector(".weather-days-container");
+  removeChildren(weatherDays);
+  removeElement(document.querySelector(".metric-toggle-btn"));
+  const metricToggle = createElement({
+    name: "metric-toggle",
+    classlist: "metric-toggle-btn",
+    type: "button",
+    text: "Metric",
+    parent: weatherDays.parentElement,
+  });
+  let metric = true;
+  metricToggle.addEventListener("click", () => {
+    metric = metric ? false : true;
+    metricToggle.textContent = metric ? "Metric" : "Imperial";
+    removeChildren(weatherDays);
+    data.forecast.forecastday.forEach((day, index) => {
+      const details = weatherDetailsHandler(data, index);
+      Object.entries(details).forEach((prop) => {
+        const val = prop[1].value;
+        const alt = prop[1].alt;
+        if (!metric) {
+          prop[1].value = alt;
+          prop[1].alt = val;
+        } else {
+          prop[1].value = val;
+          prop[1].alt = alt;
+        }
+      });
+      addWeatherDetailsDOM({
+        weatherDetails: details,
+        index,
+      });
+    });
+  });
+
+  data.forecast.forecastday.forEach((day, index) => {
+    const details = weatherDetailsHandler(data, index);
+    addWeatherDetailsDOM({
+      weatherDetails: details,
+      index,
+    });
+  });
+}
+
+function addWeatherDetailsDOM({ weatherDetails = {}, index = 1 } = {}) {
+  // console.log(weatherDetails);
 
   // const date = new Date(weatherData.forecast.forecastday[index].date);
   // const days = [
@@ -98,7 +151,6 @@ function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
   //   "Saturday",
   // ];
   const weatherDays = document.querySelector(".weather-days-container");
-
   // const dayTitle = createElement({
   //   classlist: "day-title",
   //   type: "h1",
@@ -151,7 +203,7 @@ function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
     childElems: [
       {
         name: "elem-details-container",
-        classlist: "day-details-container hidden",
+        classlist: "day-details-container  hidden",
         attributes: [{ name: "data", value: index }],
       },
     ],
@@ -160,7 +212,7 @@ function addWeatherDetailsDOM({ weatherData = {}, index = 1 } = {}) {
     dayContainer.lastElementChild.toggle("hidden");
   });
   Object.entries(weatherDetails).forEach((prop) => {
-    console.log(prop);
+    // console.log(prop);
     const propClassName = prop[0].toLowerCase();
     const elemContainer = createElement({
       name: "elem-container",
@@ -208,9 +260,7 @@ function initSearch() {
       { mode: "cors" }
     );
     const locationData = await response.json();
-    while (locationsList.firstChild) {
-      locationsList.removeChild(locationsList.firstChild);
-    }
+    removeChildren(locationsList);
     loadingIcon.classList.add("hidden");
     if (locationData.length) {
       locationData.forEach((location) => {
