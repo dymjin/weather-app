@@ -104,10 +104,21 @@ function initWeatherDOM(data) {
     parent: weatherDays.parentElement,
   });
   let metric = true;
+  removeElement(document.querySelector(".curr-weather-container"));
+  addCurrWeatherDOM({ weatherData: data });
   metricToggle.addEventListener("click", () => {
     metric = metric ? false : true;
     metricToggle.textContent = metric ? "Metric" : "Imperial";
     removeChildren(weatherDays);
+    const currTemp = document.querySelector(".curr-temp");
+    const currPrecip = document.querySelector(".curr-precip");
+    if (metric) {
+      currPrecip.textContent = data.current.precip_mm + " mm";
+      currTemp.textContent = data.current.temp_c + " °C";
+    } else {
+      currPrecip.textContent = data.current.precip_in + " in";
+      currTemp.textContent = data.current.temp_f + " °F";
+    }
     data.forecast.forecastday.forEach((day, index) => {
       const details = weatherDetailsHandler(data, index);
       Object.entries(details).forEach((prop) => {
@@ -123,34 +134,138 @@ function initWeatherDOM(data) {
       });
       addWeatherDetailsDOM({
         weatherDetails: details,
+        date: new Date(data.forecast.forecastday[index].date),
         index,
       });
     });
   });
-
   data.forecast.forecastday.forEach((day, index) => {
     const details = weatherDetailsHandler(data, index);
     addWeatherDetailsDOM({
       weatherDetails: details,
+      date: new Date(data.forecast.forecastday[index].date),
       index,
     });
   });
 }
 
-function addWeatherDetailsDOM({ weatherDetails = {}, index = 1 } = {}) {
-  // console.log(weatherDetails);
-
-  // const date = new Date(weatherData.forecast.forecastday[index].date);
-  // const days = [
-  //   "Sunday",
-  //   "Monday",
-  //   "Tuesday",
-  //   "Wednesday",
-  //   "Thursday",
-  //   "Friday",
-  //   "Saturday",
-  // ];
+function addCurrWeatherDOM({ weatherData = {} }) {
+  console.log(weatherData);
+  const currDate = new Date(weatherData.location.localtime);
+  const time = `${
+    currDate.getHours() < 10 ? `0${currDate.getHours()}` : currDate.getHours()
+  }:${
+    currDate.getMinutes() < 10
+      ? `0${currDate.getMinutes()}`
+      : currDate.getMinutes()
+  }`;
+  // console.log(time);
   const weatherDays = document.querySelector(".weather-days-container");
+  const pageWrapper = document.querySelector(".page-wrapper");
+  const currWeatherContainer = createElement({
+    // const dayTitle = createElement({
+    //   classlist: "day-title",
+    //   type: "h1",
+    //   parent: dayContainer,
+    // });
+    // const conditionIcon = createElement({
+    //   classlist: "day-display-condition-img",
+    //   type: "img",
+    //   attributes: [{ name: "src", value: dayData.condition.icon }],
+    //   parent: dayContainer,
+    // });
+    // const conditionText = createElement({
+    //   classlist: "day-display-condition-text",
+    //   parent: dayContainer,
+    // });
+    // conditionText.textContent = dayData.condition.text;
+    // const tempsContainer = createElement({
+    //   classlist: "day-display-temp-container",
+    //   parent: dayContainer,
+    // });
+    // const currTemp = createElement({
+    //   classlist: "day-display-hourly-temp",
+    //   parent: dayContainer,
+    // });
+    // currTemp.textContent = `${weatherData.current.temp_c}°C`;
+    // const minmaxTemp = createElement({
+    //   classlist: "day-display-minxmax-temp",
+    //   parent: tempsContainer,
+    // });
+    // minmaxTemp.textContent = `${dayData.mintemp_c}°C / ${dayData.maxtemp_c}°C`;
+    // const rainContainer = createElement({
+    //   classlist: "day-display-rain-container",
+    //   parent: dayContainer,
+    // });
+    // const rainIcon = createElement({
+    //   classlist: "fa-solid fa-cloud-rain rain-icon",
+    //   parent: rainContainer,
+    // });
+    // const rainChance = createElement({
+    //   classlist: "day-display-rain-chance",
+    //   parent: rainContainer,
+    // });
+    // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
+    // dayTitle.textContent = days[date.getDay()];
+    name: "curr-weather-container",
+    classlist: "curr-weather-container",
+    childElems: [
+      {
+        name: "curr-weather-title",
+        classlist: "curr-weather-title",
+        text: "Current Weather",
+      },
+      { name: "curr-weather-time", classlist: "curr-weather-time", text: time },
+      {
+        name: "curr-weather-condition-img",
+        classlist: "curr-weather-condition-img",
+        type: "img",
+        attributes: [
+          { name: "src", value: weatherData.current.condition.icon },
+        ],
+      },
+      {
+        name: "curr-weather-condition",
+        classlist: "curr-weather-condition",
+        text: weatherData.current.condition.text,
+      },
+      {
+        name: "curr-temp",
+        classlist: "curr-temp",
+        text: weatherData.current.temp_c + "°C",
+      },
+      {
+        name: "curr-humidity",
+        classlist: "curr-humidity",
+        text: `${weatherData.current.humidity}%`,
+      },
+      {
+        name: "curr-precip",
+        classlist: "curr-precip",
+        text: `${weatherData.current.precip_mm} mm`,
+      },
+    ],
+    parent: document.querySelector(".page-wrapper"),
+  });
+  pageWrapper.insertBefore(currWeatherContainer, weatherDays);
+}
+
+function addWeatherDetailsDOM({
+  weatherDetails = {},
+  date = new Date(),
+  index = 1,
+} = {}) {
+  // console.log(weatherDetails);
+  const weatherDays = document.querySelector(".weather-days-container");
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   // const dayTitle = createElement({
   //   classlist: "day-title",
   //   type: "h1",
@@ -202,8 +317,16 @@ function addWeatherDetailsDOM({ weatherDetails = {}, index = 1 } = {}) {
     attributes: [{ name: "data", value: index }],
     childElems: [
       {
+        name: "display-details-container",
+        classlist: "day-display-container",
+        attributes: [{ name: "data", value: index }],
+        childElems: [
+          { name: "display-title", type: "h1", text: days[date.getDay()] },
+        ],
+      },
+      {
         name: "elem-details-container",
-        classlist: "day-details-container  hidden",
+        classlist: "day-details-container hidden",
         attributes: [{ name: "data", value: index }],
       },
     ],
