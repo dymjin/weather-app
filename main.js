@@ -364,54 +364,64 @@ function addWeatherDetailsDOM({
   });
 }
 
-function initSearch() {
+async function locationSearchHandler() {
   const search = document.getElementById("location-search");
   const locationsList = document.getElementById("locations");
   const loadingIcon = document.getElementById("location-loading");
+  loadingIcon.classList.remove("hidden");
+  const response = await fetch(
+    `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
+      search.value || "undefined"
+    }`,
+    { mode: "cors" }
+  );
+  const locationData = await response.json();
+  removeChildren(locationsList);
+  loadingIcon.classList.add("hidden");
+  if (locationData.length) {
+    locationData.forEach((location) => {
+      if (
+        location.name
+          .toLowerCase()
+          .replaceAll(" ", "")
+          .match(search.value.toLowerCase().replaceAll(" ", ""))
+      ) {
+        const locationOption = createElement({
+          type: "span",
+          parent: locationsList,
+        });
+        locationOption.textContent = `${location.name}, ${
+          location?.region ? `${location.region}, ` : ""
+        }${location.country}`;
+
+        locationOption.addEventListener("mousedown", async () => {
+          // console.log(location);
+          search.value = location.name;
+          const weatherForecastData = await queryWeatherForecast(location.name);
+          initWeatherDOM(await weatherForecastData);
+        });
+      }
+    });
+  }
+}
+
+function initSearch() {
+  const search = document.getElementById("location-search");
+  const locationsList = document.getElementById("locations");
   search.addEventListener("blur", () => {
     locationsList.style.display = "none";
   });
   search.addEventListener("focus", () => {
+    if (
+      !document.getElementById("locations").firstChild &&
+      search.value !== ""
+    ) {
+      locationSearchHandler();
+    }
     locationsList.style.display = "flex";
   });
-  search.addEventListener("input", async () => {
-    loadingIcon.classList.remove("hidden");
-    const response = await fetch(
-      `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
-        search.value || "undefined"
-      }`,
-      { mode: "cors" }
-    );
-    const locationData = await response.json();
-    removeChildren(locationsList);
-    loadingIcon.classList.add("hidden");
-    if (locationData.length) {
-      locationData.forEach((location) => {
-        if (
-          location.name
-            .toLowerCase()
-            .replaceAll(" ", "")
-            .match(search.value.toLowerCase().replaceAll(" ", ""))
-        ) {
-          const locationOption = createElement({
-            type: "span",
-            parent: locationsList,
-          });
-          locationOption.textContent = `${location.name}, ${
-            location?.region ? `${location.region}, ` : ""
-          }${location.country}`;
-
-          locationOption.addEventListener("mousedown", async () => {
-            // console.log(location);
-            search.value = location.name;
-            const weatherForecastData = await queryWeatherForecast(
-              location.name
-            );
-            initWeatherDOM(await weatherForecastData);
-          });
-        }
-      });
-    }
+  search.addEventListener("input", () => {
+    locationSearchHandler();
   });
 }
 initSearch();
