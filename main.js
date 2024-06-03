@@ -110,15 +110,53 @@ function initWeatherDOM(data) {
   weatherDays.parentElement.insertBefore(locationHeader, weatherDays);
   removeElement(document.querySelector(".metric-toggle-btn"));
   const metricToggle = createElement({
-    name: "metric-toggle",
     classlist: "metric-toggle-btn",
     type: "button",
     text: "Metric",
     parent: weatherDays.parentElement,
   });
-  let metric = true;
+  removeElement(document.querySelector(".analog-toggle-btn"));
+  const analogToggle = createElement({
+    classlist: "analog-toggle-btn",
+    type: "button",
+    text: "24 HR",
+    parent: weatherDays.parentElement,
+  });
+  let metric = true,
+    digital = true;
   removeElement(document.querySelector(".curr-weather-container"));
   addCurrWeatherDOM({ weatherData: data });
+  analogToggle.addEventListener("click", () => {
+    digital = digital ? false : true;
+    analogToggle.textContent = digital ? "24 HR" : "AM PM";
+    const currTime = document.querySelector(".curr-weather-time");
+    const currDataTime = new Date(data.location.localtime);
+    if (!digital) {
+      if (currDataTime.getHours() > 12) {
+        currTime.textContent = `${currDataTime.getHours() - 12}:${
+          currDataTime.getMinutes() < 10
+            ? `0${currDataTime.getMinutes()}`
+            : currDataTime.getMinutes()
+        } PM`;
+      } else {
+        currTime.textContent = `${currDataTime.getHours()}:${
+          currDataTime.getMinutes() < 10
+            ? `0${currDataTime.getMinutes()}`
+            : currDataTime.getMinutes()
+        } AM`;
+      }
+    } else {
+      currTime.textContent = `${
+        currDataTime.getHours() < 10
+          ? `0${currDataTime.getHours()}`
+          : currDataTime.getHours()
+      }:${
+        currDataTime.getMinutes() < 10
+          ? `0${currDataTime.getMinutes()}`
+          : currDataTime.getMinutes()
+      }`;
+    }
+  });
   metricToggle.addEventListener("click", () => {
     metric = metric ? false : true;
     metricToggle.textContent = metric ? "Metric" : "Imperial";
@@ -176,50 +214,6 @@ function addCurrWeatherDOM({ weatherData = {} }) {
   const weatherDays = document.querySelector(".weather-days-container");
   const pageWrapper = document.querySelector(".page-wrapper");
   const currWeatherContainer = createElement({
-    // const dayTitle = createElement({
-    //   classlist: "day-title",
-    //   type: "h1",
-    //   parent: dayContainer,
-    // });
-    // const conditionIcon = createElement({
-    //   classlist: "day-display-condition-img",
-    //   type: "img",
-    //   attributes: [{ name: "src", value: dayData.condition.icon }],
-    //   parent: dayContainer,
-    // });
-    // const conditionText = createElement({
-    //   classlist: "day-display-condition-text",
-    //   parent: dayContainer,
-    // });
-    // conditionText.textContent = dayData.condition.text;
-    // const tempsContainer = createElement({
-    //   classlist: "day-display-temp-container",
-    //   parent: dayContainer,
-    // });
-    // const currTemp = createElement({
-    //   classlist: "day-display-hourly-temp",
-    //   parent: dayContainer,
-    // });
-    // currTemp.textContent = `${weatherData.current.temp_c}°C`;
-    // const minmaxTemp = createElement({
-    //   classlist: "day-display-minxmax-temp",
-    //   parent: tempsContainer,
-    // });
-    // minmaxTemp.textContent = `${dayData.mintemp_c}°C / ${dayData.maxtemp_c}°C`;
-    // const rainContainer = createElement({
-    //   classlist: "day-display-rain-container",
-    //   parent: dayContainer,
-    // });
-    // const rainIcon = createElement({
-    //   classlist: "fa-solid fa-cloud-rain rain-icon",
-    //   parent: rainContainer,
-    // });
-    // const rainChance = createElement({
-    //   classlist: "day-display-rain-chance",
-    //   parent: rainContainer,
-    // });
-    // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
-    // dayTitle.textContent = days[date.getDay()];
     name: "curr-weather-container",
     classlist: "curr-weather-container",
     childElems: [
