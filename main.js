@@ -13,6 +13,11 @@ async function queryWeatherForecast(location) {
     { mode: "cors" }
   );
   const weatherData = await response.json();
+  document.querySelector(
+    ".header-title"
+  ).textContent = `Weather.${weatherData.current.condition.text
+    .toLowerCase()
+    .replaceAll(" ", "_")}`;
   return weatherData;
 }
 
@@ -95,6 +100,14 @@ function removeChildren(container) {
 function initWeatherDOM(data) {
   const weatherDays = document.querySelector(".weather-days-container");
   removeChildren(weatherDays);
+  removeElement(document.querySelector(".location-header"));
+  const locationHeader = createElement({
+    classlist: "location-header",
+    type: "h1",
+    text: `${data.location.name}, ${data.location.country}`,
+    parent: weatherDays.parentElement,
+  });
+  weatherDays.parentElement.insertBefore(locationHeader, weatherDays);
   removeElement(document.querySelector(".metric-toggle-btn"));
   const metricToggle = createElement({
     name: "metric-toggle",
@@ -213,7 +226,8 @@ function addCurrWeatherDOM({ weatherData = {} }) {
       {
         name: "curr-weather-title",
         classlist: "curr-weather-title",
-        text: "Current Weather",
+        type: "h1",
+        text: "Today's Weather",
       },
       { name: "curr-weather-time", classlist: "curr-weather-time", text: time },
       {
