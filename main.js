@@ -64,20 +64,31 @@ function weatherDetailsHandler(data, index) {
     mintemp: {
       value: mintemp_c,
       alt: mintemp_f,
+      unit: ["°C", "°F"],
       text: "Min Temp",
+      icon: "temperature-empty",
     },
     maxtemp: {
       value: maxtemp_c,
       alt: maxtemp_f,
+      unit: ["°C", "°F"],
       text: "Max Temp",
+      icon: "temperature-full",
     },
     avgtemp: {
       value: avgtemp_c,
       alt: avgtemp_f,
+      unit: ["°C", "°F"],
       text: "Avg Temp",
-      icon: "temperature-quarter",
+      icon: "plus-minus",
     },
-    windspeed: { value: maxwind_kph, alt: maxwind_mph, text: "Wind Speed" },
+    windspeed: {
+      value: maxwind_kph,
+      alt: maxwind_mph,
+      unit: ["kph", "mph"],
+      text: "Wind Speed",
+      icon: "wind",
+    },
     condition: { value: condition.text, text: "Condition" },
   }))(dayData);
   return weatherDetails;
@@ -160,7 +171,7 @@ function initWeatherDOM(data) {
   metricToggle.addEventListener("click", () => {
     metric = metric ? false : true;
     metricToggle.textContent = metric ? "Metric" : "Imperial";
-    removeChildren(weatherDays);
+    // removeChildren(weatherDays);
     const currTemp = document.querySelector(".curr-temp");
     const currPrecip = document.querySelector(".curr-precip");
     if (metric) {
@@ -170,32 +181,63 @@ function initWeatherDOM(data) {
       currPrecip.textContent = data.current.precip_in + " in";
       currTemp.textContent = data.current.temp_f + " °F";
     }
+
+    const weatherDays = document.querySelectorAll(".weather-day-container");
+    weatherDays.forEach((day, index) => {
+      const displayTempsContainer = document.querySelector(
+        `.day-display-container[data="${index}"]>.day-display-temps-container`
+      );
+      if (metric) {
+        const displayMaxtemp = displayTempsContainer.children[0];
+        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_c} °C`;
+        const displayAvgtemp = displayTempsContainer.children[1];
+        displayAvgtemp.textContent = `${data.forecast.forecastday[index].day.avgtemp_c} °C`;
+        const displayMintemp = displayTempsContainer.children[2];
+        displayMintemp.textContent = `${data.forecast.forecastday[index].day.mintemp_c} °C`;
+      } else {
+        const displayMaxtemp = displayTempsContainer.children[0];
+        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_f} °F`;
+        const displayAvgtemp = displayTempsContainer.children[1];
+        displayAvgtemp.textContent = `${data.forecast.forecastday[index].day.avgtemp_f} °F`;
+        const displayMintemp = displayTempsContainer.children[2];
+        displayMintemp.textContent = `${data.forecast.forecastday[index].day.mintemp_f} °F`;
+      }
+    });
     data.forecast.forecastday.forEach((day, index) => {
       const details = weatherDetailsHandler(data, index);
-      Object.entries(details).forEach((prop) => {
-        const val = prop[1].value;
-        const alt = prop[1].alt;
-        if (!metric) {
-          prop[1].value = alt;
-          prop[1].alt = val;
-        } else {
-          prop[1].value = val;
-          prop[1].alt = alt;
+      Object.entries(details).forEach((prop, propIndex) => {
+        if (prop[1]?.alt && !metric) {
+          weatherDays[index].lastElementChild.children[
+            propIndex
+          ].lastElementChild.textContent = `${prop[1].alt} ${prop[1].unit[1]}`;
+        } else if (prop[1]?.alt) {
+          weatherDays[index].lastElementChild.children[
+            propIndex
+          ].lastElementChild.textContent = `${prop[1].value} ${prop[1].unit[0]}`;
         }
-      });
-      addWeatherDetailsDOM({
-        weatherDetails: details,
-        date: new Date(data.forecast.forecastday[index].date),
-        index,
       });
     });
   });
+
   data.forecast.forecastday.forEach((day, index) => {
     const details = weatherDetailsHandler(data, index);
     addWeatherDetailsDOM({
       weatherDetails: details,
       date: new Date(data.forecast.forecastday[index].date),
+      weatherData: data,
       index,
+    });
+  });
+  const displayMoreDetails = document.querySelectorAll(
+    ".day-display-more-details"
+  );
+  displayMoreDetails.forEach((icon) => {
+    icon.addEventListener("click", () => {
+      document
+        .querySelector(
+          `.day-details-container[data="${icon.getAttribute("data")}"]`
+        )
+        .classList.toggle("hidden");
     });
   });
 }
@@ -240,7 +282,7 @@ function addCurrWeatherDOM({ weatherData = {} }) {
       {
         name: "curr-temp",
         classlist: "curr-temp",
-        text: weatherData.current.temp_c + "°C",
+        text: weatherData.current.temp_c + " °C",
       },
       {
         name: "curr-humidity",
@@ -261,6 +303,7 @@ function addCurrWeatherDOM({ weatherData = {} }) {
 function addWeatherDetailsDOM({
   weatherDetails = {},
   date = new Date(),
+  weatherData = {},
   index = 1,
 } = {}) {
   // console.log(weatherDetails);
@@ -318,6 +361,8 @@ function addWeatherDetailsDOM({
   // });
   // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
   // dayTitle.textContent = days[date.getDay()];
+  // console.log(weatherDetails.conditionIMG);
+  // console.log(weatherData.forecast.forecastday);
   const dayContainer = createElement({
     classlist: "weather-day-container",
     type: "div",
@@ -329,7 +374,57 @@ function addWeatherDetailsDOM({
         classlist: "day-display-container",
         attributes: [{ name: "data", value: index }],
         childElems: [
-          { name: "display-title", type: "h1", text: days[date.getDay()] },
+          {
+            classlist: "day-display-title",
+            type: "h1",
+            text: days[date.getDay()],
+          },
+          {
+            classlist: "day-display-condition-img",
+            type: "img",
+            attributes: [
+              {
+                name: "src",
+                value:
+                  weatherData.forecast.forecastday[index].day.condition.icon,
+              },
+            ],
+          },
+          {
+            classlist: "day-display-condition-text",
+            text: weatherData.forecast.forecastday[index].day.condition.text,
+          },
+          {
+            classlist: "day-display-temps-container",
+            childElems: [
+              {
+                classlist: "day-display-maxtemp",
+                text:
+                  weatherData.forecast.forecastday[index].day.maxtemp_c + " °C",
+                alt:
+                  weatherData.forecast.forecastday[index].day.maxtemp_f + " °F",
+              },
+              {
+                classlist: "day-display-avgtemp",
+                text:
+                  weatherData.forecast.forecastday[index].day.avgtemp_c + " °C",
+                alt:
+                  weatherData.forecast.forecastday[index].day.avgtemp_f + " °F",
+              },
+              {
+                classlist: "day-display-mintemp",
+                text:
+                  weatherData.forecast.forecastday[index].day.mintemp_c + " °C",
+                alt:
+                  weatherData.forecast.forecastday[index].day.mintemp_f + " °F",
+              },
+            ],
+          },
+          {
+            classlist: "day-display-more-details fa-solid fa-circle-info",
+            type: "i",
+            attributes: [{ name: "data", value: index }],
+          },
         ],
       },
       {
@@ -339,9 +434,10 @@ function addWeatherDetailsDOM({
       },
     ],
   });
-  dayContainer.addEventListener("click", () => {
-    dayContainer.lastElementChild.toggle("hidden");
-  });
+
+  // dayContainer.addEventListener("click", () => {
+  //   dayContainer.lastElementChild.toggle("hidden");
+  // });
   Object.entries(weatherDetails).forEach((prop) => {
     // console.log(prop);
     const propClassName = prop[0].toLowerCase();
@@ -366,7 +462,13 @@ function addWeatherDetailsDOM({
             },
           ],
         },
-        { name: "elem-value", classlist: propClassName, text: prop[1].value },
+        {
+          name: "elem-value",
+          classlist: propClassName,
+          text: prop[1]?.unit
+            ? `${prop[1].value} ${prop[1].unit[0]}`
+            : prop[1].value,
+        },
       ],
     });
   });
