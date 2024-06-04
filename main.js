@@ -60,6 +60,10 @@ function weatherDetailsHandler(data, index) {
     maxwind_kph,
     maxwind_mph,
     condition,
+    avghumidity,
+    daily_chance_of_rain,
+    totalprecip_in,
+    totalprecip_mm,
   }) => ({
     mintemp: {
       value: mintemp_c,
@@ -89,7 +93,24 @@ function weatherDetailsHandler(data, index) {
       text: "Wind Speed",
       icon: "wind",
     },
-    condition: { value: condition.text, text: "Condition" },
+    condition: {
+      value: condition.text,
+      text: "Condition",
+      icon: "meteor",
+    },
+    humidty: { value: avghumidity + "%", text: "Humidity", icon: "droplet" },
+    rain_chance: {
+      value: daily_chance_of_rain + "%",
+      text: "Chance of rain",
+      icon: "cloud-rain",
+    },
+    totalprecip: {
+      value: totalprecip_mm,
+      text: "Total precipitation",
+      alt: totalprecip_in,
+      unit: ["mm", "in"],
+      icon: "ruler-vertical",
+    },
   }))(dayData);
   return weatherDetails;
 }
@@ -171,7 +192,6 @@ function initWeatherDOM(data) {
   metricToggle.addEventListener("click", () => {
     metric = metric ? false : true;
     metricToggle.textContent = metric ? "Metric" : "Imperial";
-    // removeChildren(weatherDays);
     const currTemp = document.querySelector(".curr-temp");
     const currPrecip = document.querySelector(".curr-precip");
     if (metric) {
@@ -252,7 +272,6 @@ function addCurrWeatherDOM({ weatherData = {} }) {
       ? `0${currDate.getMinutes()}`
       : currDate.getMinutes()
   }`;
-  // console.log(time);
   const weatherDays = document.querySelector(".weather-days-container");
   const pageWrapper = document.querySelector(".page-wrapper");
   const currWeatherContainer = createElement({
@@ -317,52 +336,6 @@ function addWeatherDetailsDOM({
     "Friday",
     "Saturday",
   ];
-  // const dayTitle = createElement({
-  //   classlist: "day-title",
-  //   type: "h1",
-  //   parent: dayContainer,
-  // });
-  // const conditionIcon = createElement({
-  //   classlist: "day-display-condition-img",
-  //   type: "img",
-  //   attributes: [{ name: "src", value: dayData.condition.icon }],
-  //   parent: dayContainer,
-  // });
-  // const conditionText = createElement({
-  //   classlist: "day-display-condition-text",
-  //   parent: dayContainer,
-  // });
-  // conditionText.textContent = dayData.condition.text;
-  // const tempsContainer = createElement({
-  //   classlist: "day-display-temp-container",
-  //   parent: dayContainer,
-  // });
-  // const currTemp = createElement({
-  //   classlist: "day-display-hourly-temp",
-  //   parent: dayContainer,
-  // });
-  // currTemp.textContent = `${weatherData.current.temp_c}°C`;
-  // const minmaxTemp = createElement({
-  //   classlist: "day-display-minxmax-temp",
-  //   parent: tempsContainer,
-  // });
-  // minmaxTemp.textContent = `${dayData.mintemp_c}°C / ${dayData.maxtemp_c}°C`;
-  // const rainContainer = createElement({
-  //   classlist: "day-display-rain-container",
-  //   parent: dayContainer,
-  // });
-  // const rainIcon = createElement({
-  //   classlist: "fa-solid fa-cloud-rain rain-icon",
-  //   parent: rainContainer,
-  // });
-  // const rainChance = createElement({
-  //   classlist: "day-display-rain-chance",
-  //   parent: rainContainer,
-  // });
-  // rainChance.textContent = `${dayData.daily_chance_of_rain}%`;
-  // dayTitle.textContent = days[date.getDay()];
-  // console.log(weatherDetails.conditionIMG);
-  // console.log(weatherData.forecast.forecastday);
   const dayContainer = createElement({
     classlist: "weather-day-container",
     type: "div",
@@ -421,6 +394,12 @@ function addWeatherDetailsDOM({
             ],
           },
           {
+            classlist: "day-display-rain-chance",
+            text:
+              weatherData.forecast.forecastday[index].day.daily_chance_of_rain +
+              "%",
+          },
+          {
             classlist: "day-display-more-details fa-solid fa-circle-info",
             type: "i",
             attributes: [{ name: "data", value: index }],
@@ -435,11 +414,7 @@ function addWeatherDetailsDOM({
     ],
   });
 
-  // dayContainer.addEventListener("click", () => {
-  //   dayContainer.lastElementChild.toggle("hidden");
-  // });
   Object.entries(weatherDetails).forEach((prop) => {
-    // console.log(prop);
     const propClassName = prop[0].toLowerCase();
     const elemContainer = createElement({
       name: "elem-container",
@@ -505,7 +480,6 @@ async function locationSearchHandler() {
         }${location.country}`;
 
         locationOption.addEventListener("mousedown", async () => {
-          // console.log(location);
           search.value = location.name;
           const weatherForecastData = await queryWeatherForecast(location.name);
           initWeatherDOM(await weatherForecastData);
