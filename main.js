@@ -262,15 +262,31 @@ function initWeatherDOM(data) {
   );
   displayMoreDetails.forEach((icon) => {
     icon.addEventListener("click", () => {
-      document
-        .querySelector(
-          `.day-details-container[data="${icon.getAttribute("data")}"]`
-        )
-        .classList.toggle("hidden");
+      const detailsContainer = document.querySelector(
+        `.day-details-container[data="${icon.getAttribute("data")}"]`
+      );
       const dayContainer = document.querySelector(
         `.weather-day-container[data="${icon.getAttribute("data")}"]`
       );
-      dayContainer.classList.toggle('wide')
+      const dayContainersArr = document.querySelectorAll(
+        ".weather-day-container"
+      );
+      const detailsContainersArr = document.querySelectorAll(
+        ".day-details-container"
+      );
+      dayContainersArr.forEach((child) => {
+        if (child !== dayContainer) {
+          child.classList.remove("wide");
+        }
+      });
+      detailsContainersArr.forEach((child) => {
+        if (child !== detailsContainer) {
+          child.classList.add("hidden");
+        }
+      });
+      detailsContainer.classList.toggle("hidden");
+      dayContainer.classList.toggle("wide");
+      dayContainer.scrollIntoView({ block: "start", behavior: "smooth" });
     });
   });
 }
