@@ -1,33 +1,226 @@
-html {
-  height: 100%;
-  transition: all 200ms ease-in-out;
+*,
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100vh;
+}
+
+/* body {
+  background: radial-gradient(
+      ellipse at top left,
+      rgb(17, 131, 125),
+      transparent
+    ),
+    radial-gradient(ellipse at top right, rgb(61, 113, 255), transparent),
+    radial-gradient(ellipse at bottom, rgb(22, 22, 80), transparent), rgb(66, 66, 66);
+} */
+
+:root {
+  --weather-content-width: 60%;
 }
 
 body {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5rem;
   align-items: center;
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: blue;
-  width: 50px;
-  height: 50px;
-}
-
-#sun-icon {
-  transition: all 200ms ease-in-out;
-  font-size: 2rem;
+  gap: 3rem;
 }
 
 i.hidden {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
+.page-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  flex: 10;
+}
+
+/* weather content */
+.weather-content {
+  width: max(250px, var(--weather-content-width));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  border: 1px solid black;
+  padding: 2rem;
+  position: relative;
+}
+
+.location-header {
+  text-align: center;
+}
+
+.toggle-btns-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+/* end weather content */
+
+/* weather data container */
+.weather-data-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+/* end weather data container */
+
+/* curr weather */
+.curr-weather-container {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  border: 1px solid black;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.curr-weather-title {
+  text-align: center;
+}
+
+.curr-weather-items {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.curr-weather-data {
+  flex: 1 1 250px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  grid-auto-flow: dense;
+}
+
+.curr-humidity,
+.curr-precip,
+.curr-temp,
+.curr-weather-time {
+  grid-column: 2/3;
+}
+
+.curr-weather-condition-container {
+  grid-row: span 4;
+  display: grid;
+  justify-items: center;
+  grid-template-columns: 1fr;
+}
+
+.curr-weather-condition {
+  text-align: center;
+}
+
+.curr-weather-text {
+  flex: 10 1 250px;
+  text-align: justify;
+}
+/* end curr weather */
+
+/* weather days */
+.weather-days-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
+.weather-day-container {
+  flex: 1 1 250px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  position: relative;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.day-display-title {
+  text-align: center;
+  flex: 2;
+}
+
+.day-display-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.day-display-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: dense;
+  justify-items: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-display-condition-container {
+  grid-row: span 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.day-display-condition-text {
+  text-align: center;
+}
+
+.day-display-temps-container {
+  text-align: end;
+}
+
+.day-display-rain-chance {
+  grid-column: 2/3;
+  text-align: center;
+}
+
+.day-details-container {
+  /* flex: 1 1 250px; */
+  border: 1px solid black;
+}
+
+.day-display-more-details {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+/* .day-display-maxtemp {
+  grid-row: span 2;
+}
+
+.day-display-avgtemp,
+.day-display-mintemp {
+  grid-column: 2/3;
+} */
+/* end weather days */
+
+/* searchbar */
 #location-search {
   position: relative;
 }
@@ -43,7 +236,33 @@ i.hidden {
   background-color: blue;
   cursor: pointer;
 }
+/* end searchbar */
 
-.hidden {
-  display: none;
+/* footer */
+.footer-container {
+  background-color: grey;
+  width: 100%;
+  padding: 1rem;
 }
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+}
+/* end footer */
+
+/* .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: blue;
+  width: 50px;
+  height: 50px;
+} */
+
+/* #sun-icon {
+  transition: all 200ms ease-in-out;
+  font-size: 2rem;
+} */

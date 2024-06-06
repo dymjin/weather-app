@@ -130,6 +130,7 @@ function removeChildren(container) {
 }
 
 function initWeatherDOM(data) {
+  const weatherContent = document.querySelector(".weather-content");
   const weatherDays = document.querySelector(".weather-days-container");
   removeChildren(weatherDays);
   removeElement(document.querySelector(".location-header"));
@@ -137,30 +138,38 @@ function initWeatherDOM(data) {
     classlist: "location-header",
     type: "h1",
     text: `${data.location.name}, ${data.location.country}`,
-    parent: weatherDays.parentElement,
+    parent: weatherContent,
   });
-  weatherDays.parentElement.insertBefore(locationHeader, weatherDays);
-  removeElement(document.querySelector(".metric-toggle-btn"));
-  const metricToggle = createElement({
-    classlist: "metric-toggle-btn",
-    type: "button",
-    text: "Metric",
-    parent: weatherDays.parentElement,
+  weatherContent.insertBefore(
+    locationHeader,
+    document.querySelector(".weather-data-container")
+  );
+  removeElement(document.querySelector(".toggle-btns-container"));
+  const toggleBtnsContainer = createElement({
+    classlist: "toggle-btns-container",
+    childElems: [
+      {
+        classlist: "metric-toggle-btn",
+        type: "button",
+        text: "Metric",
+      },
+      {
+        classlist: "analog-toggle-btn",
+        type: "button",
+        text: "24:00",
+      },
+    ],
+    parent: weatherContent,
   });
-  removeElement(document.querySelector(".analog-toggle-btn"));
-  const analogToggle = createElement({
-    classlist: "analog-toggle-btn",
-    type: "button",
-    text: "24 HR",
-    parent: weatherDays.parentElement,
-  });
+  const metricToggle = document.querySelector(".metric-toggle-btn");
+  const analogToggle = document.querySelector(".analog-toggle-btn");
   let metric = true,
     digital = true;
   removeElement(document.querySelector(".curr-weather-container"));
   addCurrWeatherDOM({ weatherData: data });
   analogToggle.addEventListener("click", () => {
     digital = digital ? false : true;
-    analogToggle.textContent = digital ? "24 HR" : "AM PM";
+    analogToggle.textContent = digital ? "24:00" : "12 AM";
     const currTime = document.querySelector(".curr-weather-time");
     const currDataTime = new Date(data.location.localtime);
     if (!digital) {
@@ -227,11 +236,11 @@ function initWeatherDOM(data) {
       const details = weatherDetailsHandler(data, index);
       Object.entries(details).forEach((prop, propIndex) => {
         if (prop[1]?.alt && !metric) {
-          weatherDays[index].lastElementChild.children[
+          weatherDays[index].lastElementChild.lastElementChild.children[
             propIndex
           ].lastElementChild.textContent = `${prop[1].alt} ${prop[1].unit[1]}`;
         } else if (prop[1]?.alt) {
-          weatherDays[index].lastElementChild.children[
+          weatherDays[index].lastElementChild.lastElementChild.children[
             propIndex
           ].lastElementChild.textContent = `${prop[1].value} ${prop[1].unit[0]}`;
         }
@@ -263,7 +272,7 @@ function initWeatherDOM(data) {
 }
 
 function addCurrWeatherDOM({ weatherData = {} }) {
-  console.log(weatherData);
+  // console.log(weatherData);
   const currDate = new Date(weatherData.location.localtime);
   const time = `${
     currDate.getHours() < 10 ? `0${currDate.getHours()}` : currDate.getHours()
@@ -273,7 +282,9 @@ function addCurrWeatherDOM({ weatherData = {} }) {
       : currDate.getMinutes()
   }`;
   const weatherDays = document.querySelector(".weather-days-container");
-  const pageWrapper = document.querySelector(".page-wrapper");
+  const weatherDataContainer = document.querySelector(
+    ".weather-data-container"
+  );
   const currWeatherContainer = createElement({
     name: "curr-weather-container",
     classlist: "curr-weather-container",
@@ -284,39 +295,66 @@ function addCurrWeatherDOM({ weatherData = {} }) {
         type: "h1",
         text: "Today's Weather",
       },
-      { name: "curr-weather-time", classlist: "curr-weather-time", text: time },
       {
-        name: "curr-weather-condition-img",
-        classlist: "curr-weather-condition-img",
-        type: "img",
-        attributes: [
-          { name: "src", value: weatherData.current.condition.icon },
+        classlist: "curr-weather-items",
+        childElems: [
+          {
+            classlist: "curr-weather-data",
+            childElems: [
+              {
+                classlist: "curr-weather-condition-container",
+                childElems: [
+                  {
+                    name: "curr-weather-condition-img",
+                    classlist: "curr-weather-condition-img",
+                    type: "img",
+                    attributes: [
+                      {
+                        name: "src",
+                        value: weatherData.current.condition.icon,
+                      },
+                    ],
+                  },
+                  {
+                    name: "curr-weather-condition",
+                    classlist: "curr-weather-condition",
+                    text: weatherData.current.condition.text,
+                  },
+                ],
+              },
+              {
+                name: "curr-humidity",
+                classlist: "curr-humidity",
+                text: `${weatherData.current.humidity}%`,
+              },
+              {
+                name: "curr-precip",
+                classlist: "curr-precip",
+                text: `${weatherData.current.precip_mm} mm`,
+              },
+              {
+                name: "curr-temp",
+                classlist: "curr-temp",
+                text: weatherData.current.temp_c + " °C",
+              },
+              {
+                name: "curr-weather-time",
+                classlist: "curr-weather-time",
+                text: time,
+              },
+            ],
+          },
+          {
+            classlist: "curr-weather-text",
+            type: "p",
+            text: "Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. ",
+          },
         ],
       },
-      {
-        name: "curr-weather-condition",
-        classlist: "curr-weather-condition",
-        text: weatherData.current.condition.text,
-      },
-      {
-        name: "curr-temp",
-        classlist: "curr-temp",
-        text: weatherData.current.temp_c + " °C",
-      },
-      {
-        name: "curr-humidity",
-        classlist: "curr-humidity",
-        text: `${weatherData.current.humidity}%`,
-      },
-      {
-        name: "curr-precip",
-        classlist: "curr-precip",
-        text: `${weatherData.current.precip_mm} mm`,
-      },
     ],
-    parent: document.querySelector(".page-wrapper"),
+    parent: document.querySelector(".weather-data-container"),
   });
-  pageWrapper.insertBefore(currWeatherContainer, weatherDays);
+  weatherDataContainer.insertBefore(currWeatherContainer, weatherDays);
 }
 
 function addWeatherDetailsDOM({
@@ -343,73 +381,91 @@ function addWeatherDetailsDOM({
     attributes: [{ name: "data", value: index }],
     childElems: [
       {
-        name: "display-details-container",
-        classlist: "day-display-container",
+        classlist: "day-display-title",
+        type: "h1",
+        text: days[date.getDay()],
+      },
+      {
+        classlist: "day-display-more-details fa-solid fa-circle-info",
+        type: "i",
         attributes: [{ name: "data", value: index }],
+      },
+      {
+        classlist: "day-display-data",
         childElems: [
           {
-            classlist: "day-display-title",
-            type: "h1",
-            text: days[date.getDay()],
-          },
-          {
-            classlist: "day-display-condition-img",
-            type: "img",
-            attributes: [
-              {
-                name: "src",
-                value:
-                  weatherData.forecast.forecastday[index].day.condition.icon,
-              },
-            ],
-          },
-          {
-            classlist: "day-display-condition-text",
-            text: weatherData.forecast.forecastday[index].day.condition.text,
-          },
-          {
-            classlist: "day-display-temps-container",
+            name: "display-details-container",
+            classlist: "day-display-container",
+            attributes: [{ name: "data", value: index }],
             childElems: [
               {
-                classlist: "day-display-maxtemp",
-                text:
-                  weatherData.forecast.forecastday[index].day.maxtemp_c + " °C",
-                alt:
-                  weatherData.forecast.forecastday[index].day.maxtemp_f + " °F",
+                classlist: "day-display-condition-container",
+                childElems: [
+                  {
+                    classlist: "day-display-condition-img",
+                    type: "img",
+                    attributes: [
+                      {
+                        name: "src",
+                        value:
+                          weatherData.forecast.forecastday[index].day.condition
+                            .icon,
+                      },
+                    ],
+                  },
+                  {
+                    classlist: "day-display-condition-text",
+                    text: weatherData.forecast.forecastday[index].day.condition
+                      .text,
+                  },
+                ],
               },
               {
-                classlist: "day-display-avgtemp",
-                text:
-                  weatherData.forecast.forecastday[index].day.avgtemp_c + " °C",
-                alt:
-                  weatherData.forecast.forecastday[index].day.avgtemp_f + " °F",
+                classlist: "day-display-temps-container",
+                childElems: [
+                  {
+                    classlist: "day-display-mintemp",
+                    text:
+                      weatherData.forecast.forecastday[index].day.mintemp_c +
+                      " °C",
+                    alt:
+                      weatherData.forecast.forecastday[index].day.mintemp_f +
+                      " °F",
+                  },
+                  {
+                    classlist: "day-display-avgtemp",
+                    text:
+                      weatherData.forecast.forecastday[index].day.avgtemp_c +
+                      " °C",
+                    alt:
+                      weatherData.forecast.forecastday[index].day.avgtemp_f +
+                      " °F",
+                  },
+                  {
+                    classlist: "day-display-maxtemp",
+                    text:
+                      weatherData.forecast.forecastday[index].day.maxtemp_c +
+                      " °C",
+                    alt:
+                      weatherData.forecast.forecastday[index].day.maxtemp_f +
+                      " °F",
+                  },
+                ],
               },
               {
-                classlist: "day-display-mintemp",
+                classlist: "day-display-rain-chance",
                 text:
-                  weatherData.forecast.forecastday[index].day.mintemp_c + " °C",
-                alt:
-                  weatherData.forecast.forecastday[index].day.mintemp_f + " °F",
+                  weatherData.forecast.forecastday[index].day
+                    .daily_chance_of_rain + "% Rain coverage",
               },
             ],
           },
           {
-            classlist: "day-display-rain-chance",
-            text:
-              weatherData.forecast.forecastday[index].day.daily_chance_of_rain +
-              "%",
-          },
-          {
-            classlist: "day-display-more-details fa-solid fa-circle-info",
-            type: "i",
+            name: "elem-details-container",
+            classlist: "day-details-container hidden",
             attributes: [{ name: "data", value: index }],
           },
         ],
-      },
-      {
-        name: "elem-details-container",
-        classlist: "day-details-container hidden",
-        attributes: [{ name: "data", value: index }],
       },
     ],
   });
