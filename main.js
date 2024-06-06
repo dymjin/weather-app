@@ -267,6 +267,10 @@ function initWeatherDOM(data) {
           `.day-details-container[data="${icon.getAttribute("data")}"]`
         )
         .classList.toggle("hidden");
+      const dayContainer = document.querySelector(
+        `.weather-day-container[data="${icon.getAttribute("data")}"]`
+      );
+      dayContainer.classList.toggle('wide')
     });
   });
 }

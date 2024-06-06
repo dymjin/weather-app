@@ -41,6 +41,10 @@ i.hidden {
   display: none;
 }
 
+.weather-day-container.wide {
+  flex: 1 1 100%;
+}
+
 .page-wrapper {
   width: 100%;
   display: flex;
@@ -206,8 +210,8 @@ i.hidden {
 
 .day-display-more-details {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.5rem;
+  left: 0.5rem;
 }
 
 /* .day-display-maxtemp {
