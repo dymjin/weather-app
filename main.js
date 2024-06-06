@@ -218,18 +218,18 @@ function initWeatherDOM(data) {
       );
       if (metric) {
         const displayMaxtemp = displayTempsContainer.children[0];
-        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_c} °C`;
+        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.mintemp_c} °C`;
         const displayAvgtemp = displayTempsContainer.children[1];
         displayAvgtemp.textContent = `${data.forecast.forecastday[index].day.avgtemp_c} °C`;
         const displayMintemp = displayTempsContainer.children[2];
-        displayMintemp.textContent = `${data.forecast.forecastday[index].day.mintemp_c} °C`;
+        displayMintemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_c} °C`;
       } else {
         const displayMaxtemp = displayTempsContainer.children[0];
-        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_f} °F`;
+        displayMaxtemp.textContent = `${data.forecast.forecastday[index].day.mintemp_f} °F`;
         const displayAvgtemp = displayTempsContainer.children[1];
         displayAvgtemp.textContent = `${data.forecast.forecastday[index].day.avgtemp_f} °F`;
         const displayMintemp = displayTempsContainer.children[2];
-        displayMintemp.textContent = `${data.forecast.forecastday[index].day.mintemp_f} °F`;
+        displayMintemp.textContent = `${data.forecast.forecastday[index].day.maxtemp_f} °F`;
       }
     });
     data.forecast.forecastday.forEach((day, index) => {
