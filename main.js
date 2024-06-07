@@ -156,7 +156,7 @@ function initWeatherDOM(data) {
       {
         classlist: "analog-toggle-btn",
         type: "button",
-        text: "24:00",
+        text: "24HR",
       },
     ],
     parent: document.querySelector(".searchbar-wrapper"),
@@ -169,7 +169,7 @@ function initWeatherDOM(data) {
   addCurrWeatherDOM({ weatherData: data });
   analogToggle.addEventListener("click", () => {
     digital = digital ? false : true;
-    analogToggle.textContent = digital ? "24:00" : "12 AM";
+    analogToggle.textContent = digital ? "24HR" : "12HR";
     const currTime = document.querySelector(".curr-weather-time");
     const currDataTime = new Date(data.location.localtime);
     if (!digital) {

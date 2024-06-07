@@ -57,7 +57,7 @@ i.hidden {
 
 /* weather content */
 .weather-content {
-  width: max(400px, var(--weather-content-width));
+  width: max(450px, var(--weather-content-width));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,8 +75,23 @@ i.hidden {
 .toggle-btns-container {
   display: flex;
   gap: 1rem;
-  justify-content: center;
   align-items: center;
+}
+
+.toggle-btns-container > button {
+  appearance: none;
+  border: none;
+  --toggle-btn-bgc: #e2e2e2;
+  background-color: var(--toggle-btn-bgc);
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.3rem;
+  transition: all 200ms ease-in-out;
+  &:hover {
+    background-color: color-mix(in srgb, var(--toggle-btn-bgc) 100%, black 20%);
+  }
+  &:active {
+    background-color: color-mix(in srgb, var(--toggle-btn-bgc) 100%, white 30%);
+  }
 }
 
 /* end weather content */
@@ -248,7 +263,16 @@ i.hidden {
   padding: 0.5rem 1rem;
   border-radius: 1rem;
   border: none;
-  background-color: #e4e4e4;
+  --location-search-bgc: #e4e4e4;
+  background-color: var(--location-search-bgc);
+  transition: all 200ms ease-in-out;
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--location-search-bgc) 100%,
+      white 40%
+    );
+  }
 }
 
 #locations {
