@@ -1,1 +1,1 @@
-# weather-app
+First project using APIs. Solved some old problems using new knowledge, but still struggling with code structure. Planning wasn't too great again, might improve in the future. Icons by [FontAwesome](https://fontawesome.com/). Font found on Google fonts. Live preview: https://dymjin.github.io/weather-app/
