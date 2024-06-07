@@ -1,6 +1,6 @@
 async function queryWeatherCurrent(location) {
   const response = await fetch(
-    `https://api.weatherapi.com/v1/current.json?key=642ff04962c74e13ade91014240305&q=${location}&aqi=no`,
+    `https://api.weatherapi.com/v1/current.json?key=642ff04962c74e13ade91014240305&q=${location}&aqi=no.localhost/`,
     { mode: "cors" }
   );
   const weatherData = await response.json();
@@ -9,7 +9,7 @@ async function queryWeatherCurrent(location) {
 
 async function queryWeatherForecast(location) {
   const response = await fetch(
-    `https://api.weatherapi.com/v1/forecast.json?key=642ff04962c74e13ade91014240305&q=${location}&days=3&aqi=no&alerts=no`,
+    `https://api.weatherapi.com/v1/forecast.json?key=642ff04962c74e13ade91014240305&q=${location}&days=3&aqi=no&alerts=no.localhost/`,
     { mode: "cors" }
   );
   const weatherData = await response.json();
@@ -554,7 +554,7 @@ async function locationSearchHandler() {
   const response = await fetch(
     `https://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
       search.value || "undefined"
-    }`,
+    }.localhost/`,
     { mode: "cors" }
   );
   const locationData = await response.json();
