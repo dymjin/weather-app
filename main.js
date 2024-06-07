@@ -204,9 +204,23 @@ function initWeatherDOM(data) {
     const currTemp = document.querySelector(".curr-temp");
     const currPrecip = document.querySelector(".curr-precip");
     if (metric) {
+      const currWeatherText = document.querySelector(".curr-weather-text");
+      currWeatherText.textContent = `The current temperature is ${data.current.temp_c}°C, today will reach a maximum of ${data.forecast.forecastday[0].day.maxtemp_c}°C, a minimum of ${data.forecast.forecastday[0].day.mintemp_c}°C, and an average temperature of ${data.forecast.forecastday[0].day.avgtemp_c}°C. `;
+      currWeatherText.textContent += `Humidity is currently ${data.current.humidity}%. `;
+      data.forecast.forecastday[0].day.daily_will_it_rain
+        ? (currWeatherText.textContent += `Rain is expected with a total precipitation of ${data.forecast.forecastday[0].day.totalprecip_mm} mm.`)
+        : (currWeatherText.textContent +=
+            "No rain expected, with little to no precipitation. ");
       currPrecip.textContent = data.current.precip_mm + " mm";
       currTemp.textContent = data.current.temp_c + " °C";
     } else {
+      const currWeatherText = document.querySelector(".curr-weather-text");
+      currWeatherText.textContent = `The current temperature is ${data.current.temp_f}°F, today will reach a maximum of ${data.forecast.forecastday[0].day.maxtemp_f}°F, a minimum of ${data.forecast.forecastday[0].day.mintemp_f}°F, and an average temperature of ${data.forecast.forecastday[0].day.avgtemp_f}°F. `;
+      currWeatherText.textContent += `Humidity is currently ${data.current.humidity}%. `;
+      data.forecast.forecastday[0].day.daily_will_it_rain
+        ? (currWeatherText.textContent += `Rain is expected with a total precipitation of ${data.forecast.forecastday[0].day.totalprecip_in} in.`)
+        : (currWeatherText.textContent +=
+            "No rain expected, with little to no precipitation. ");
       currPrecip.textContent = data.current.precip_in + " in";
       currTemp.textContent = data.current.temp_f + " °F";
     }
@@ -367,13 +381,19 @@ function addCurrWeatherDOM({ weatherData = {} }) {
           {
             classlist: "curr-weather-text",
             type: "p",
-            text: "Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. Lorem ipsum dolor sit a met. ",
           },
         ],
       },
     ],
     parent: document.querySelector(".weather-data-container"),
   });
+  const currWeatherText = document.querySelector(".curr-weather-text");
+  currWeatherText.textContent = `The current temperature is ${weatherData.current.temp_c}°C, today will reach a maximum of ${weatherData.forecast.forecastday[0].day.maxtemp_c}°C, a minimum of ${weatherData.forecast.forecastday[0].day.mintemp_c}°C, and an average temperature of ${weatherData.forecast.forecastday[0].day.avgtemp_c}°C. `;
+  currWeatherText.textContent += `Humidity is currently ${weatherData.current.humidity}%. `;
+  weatherData.forecast.forecastday[0].day.daily_will_it_rain
+    ? (currWeatherText.textContent += `Rain is expected with a total precipitation of ${weatherData.forecast.forecastday[0].day.totalprecip_mm} mm.`)
+    : (currWeatherText.textContent +=
+        "No rain expected, with little to no precipitation. ");
   weatherDataContainer.insertBefore(currWeatherContainer, weatherDays);
 }
 
@@ -476,7 +496,7 @@ function addWeatherDetailsDOM({
                 classlist: "day-display-rain-chance",
                 text:
                   weatherData.forecast.forecastday[index].day
-                    .daily_chance_of_rain + "% Rain coverage",
+                    .daily_chance_of_rain + "% Rain chance",
               },
             ],
           },
@@ -556,8 +576,24 @@ async function locationSearchHandler() {
         }${location.country}`;
 
         locationOption.addEventListener("mousedown", async () => {
+          const weatherDataContainer = document.querySelector(
+            ".weather-data-container"
+          );
+          weatherDataContainer.classList.remove("hidden");
+          removeChildren(weatherDataContainer);
           search.value = location.name;
+          const locationDataLoadingIcon = createElement({
+            classlist: "fa-solid fa-spinner fa-spin-pulse",
+            type: "i",
+            parent: weatherDataContainer,
+          });
+          locationDataLoadingIcon.setAttribute("id", "location-data-loading");
+          const weatherDays = createElement({
+            classlist: "weather-days-container",
+            parent: weatherDataContainer,
+          });
           const weatherForecastData = await queryWeatherForecast(location.name);
+          locationDataLoadingIcon.classList.add("hidden");
           initWeatherDOM(await weatherForecastData);
         });
       }

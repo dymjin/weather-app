@@ -78,14 +78,26 @@ i.hidden {
   text-align: center;
   color: white;
 }
+
+#location-data-loading:not(.hidden) {
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  margin-top: 2rem;
+  color: white;
+}
 /* end weather content */
 
 /* weather data container */
-.weather-data-container {
+.weather-data-container:not(.hidden) {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  align-items: center;
+  gap: 3rem;
 }
 /* end weather data container */
 
@@ -94,7 +106,6 @@ i.hidden {
   width: 100%;
   display: grid;
   justify-items: center;
-  /* border: 1px solid black; */
   background-color: black;
   color: white;
   border-radius: 1rem;
@@ -265,15 +276,6 @@ i.hidden {
     color: color-mix(in srgb, white 100%, black 40%);
   }
 }
-
-/* .day-display-maxtemp {
-  grid-row: span 2;
-}
-
-.day-display-avgtemp,
-.day-display-mintemp {
-  grid-column: 2/3;
-} */
 /* end weather days */
 
 /* searchbar */
@@ -355,8 +357,6 @@ i.hidden {
   appearance: none;
   color: white;
   border: none;
-  /* --toggle-btn-bgc: #e2e2e2; */
-  /* background-color: var(--toggle-btn-bgc); */
   background-color: black;
   padding: 0.3rem 0.5rem;
   border-radius: 0.3rem;
@@ -370,7 +370,6 @@ i.hidden {
     background-color: color-mix(in srgb, white 100%, black 20%);
   }
 }
-
 /* end searchbar */
 
 /* footer */
@@ -395,17 +394,3 @@ i.hidden {
   color: white;
 }
 /* end footer */
-
-/* .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: blue;
-  width: 50px;
-  height: 50px;
-} */
-
-/* #sun-icon {
-  transition: all 200ms ease-in-out;
-  font-size: 2rem;
-} */
