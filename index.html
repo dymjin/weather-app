@@ -16,16 +16,20 @@
       <div class="header-container">
         <h1 class="header-title">Weather.rainy</h1>
       </div>
-      <div class="searchbar-container">
-        <label for="location-search"><i class="fa-solid fa-search"></i></label>
-        <input type="search" id="location-search" />
-        <div id="locations"></div>
-        <i
-          class="fa-solid fa-spinner fa-spin-pulse hidden"
-          id="location-loading"
-        ></i>
-      </div>
       <div class="weather-content">
+        <div class="searchbar-wrapper">
+          <label for="location-search"
+            ><i class="fa-solid fa-search"></i
+          ></label>
+          <div class="searchbar-container">
+            <input type="search" id="location-search" />
+            <div id="locations"></div>
+            <i
+              class="fa-solid fa-spinner fa-spin-pulse hidden"
+              id="location-loading"
+            ></i>
+          </div>
+        </div>
         <div class="weather-data-container">
           <div class="weather-days-container"></div>
         </div>

@@ -159,7 +159,7 @@ function initWeatherDOM(data) {
         text: "24:00",
       },
     ],
-    parent: weatherContent,
+    parent: document.querySelector(".searchbar-wrapper"),
   });
   const metricToggle = document.querySelector(".metric-toggle-btn");
   const analogToggle = document.querySelector(".analog-toggle-btn");
@@ -563,11 +563,17 @@ async function locationSearchHandler() {
       }
     });
   }
+  if (locationsList.children.length) {
+    locationsList.style.display = "flex";
+  } else {
+    locationsList.style.display = "none";
+  }
 }
 
 function initSearch() {
   const search = document.getElementById("location-search");
   const locationsList = document.getElementById("locations");
+  locationsList.style.display = "none";
   search.addEventListener("blur", () => {
     locationsList.style.display = "none";
   });
@@ -578,7 +584,11 @@ function initSearch() {
     ) {
       locationSearchHandler();
     }
-    locationsList.style.display = "flex";
+    if (locationsList.children.length) {
+      locationsList.style.display = "flex";
+    } else {
+      locationsList.style.display = "none";
+    }
   });
   search.addEventListener("input", () => {
     locationSearchHandler();

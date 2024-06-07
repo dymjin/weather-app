@@ -57,7 +57,7 @@ i.hidden {
 
 /* weather content */
 .weather-content {
-  width: max(250px, var(--weather-content-width));
+  width: max(400px, var(--weather-content-width));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,9 +77,6 @@ i.hidden {
   gap: 1rem;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
 }
 
 /* end weather content */
@@ -225,19 +222,55 @@ i.hidden {
 /* end weather days */
 
 /* searchbar */
-#location-search {
+.searchbar-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.searchbar-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   position: relative;
 }
 
-#locations {
+#location-loading {
   position: absolute;
-  margin-top: 1rem;
+  right: 0.5rem;
+  top: 0.5rem;
+}
+
+#location-search {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  border: none;
+  background-color: #e4e4e4;
+}
+
+#locations {
+  background-color: #e4e4e4;
+  width: 100%;
+  position: absolute;
+  top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
   flex-direction: column;
 }
 
+#locations > * {
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+}
+
 #locations > span:hover {
-  background-color: blue;
+  background-color: color-mix(in srgb, white 100%, black 30%);
   cursor: pointer;
 }
 /* end searchbar */
