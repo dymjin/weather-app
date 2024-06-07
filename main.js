@@ -552,7 +552,7 @@ async function locationSearchHandler() {
   const loadingIcon = document.getElementById("location-loading");
   loadingIcon.classList.remove("hidden");
   const response = await fetch(
-    `http://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
+    `https://api.weatherapi.com/v1/search.json?key=642ff04962c74e13ade91014240305&q=${
       search.value || "undefined"
     }`,
     { mode: "cors" }
