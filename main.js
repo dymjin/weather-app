@@ -303,6 +303,7 @@ function initWeatherDOM(data) {
       dayContainer.scrollIntoView({ block: "start", behavior: "smooth" });
     });
   });
+  document.body.style.background = tempToBGGradient(data.current.temp_c);
 }
 
 function addCurrWeatherDOM({ weatherData = {} }) {
@@ -632,69 +633,16 @@ function initSearch() {
 }
 initSearch();
 
-function timeToRGB(time = new Date()) {
-  const timeInRGB = Math.round(
-    time.getHours() < 12
-      ? time.getHours() * (255 / 12)
-      : (24 - time.getHours()) * (255 / 12)
-  );
-  return timeInRGB;
+function tempToBGGradient(temp) {
+  const tempInColor = ((360 / 100) * temp) / 2 + 270;
+  const tempInBGGradient = `radial-gradient(ellipse at top left, hsl(${
+    tempInColor + 25
+  }, 20%, 70%), transparent),
+    radial-gradient(ellipse at top right, hsl(${
+      tempInColor - 55
+    }, 50%, 50%), transparent),
+    radial-gradient(ellipse at bottom, hsl(${tempInColor}, 100%, 20%), transparent),
+    hsl(${tempInColor}, ${temp / 2 + 25}%, ${temp}%)`;
+  console.log(tempInBGGradient);
+  return tempInBGGradient;
 }
-
-function timeToDeg(time = new Date()) {
-  const timeInDeg = time.getHours() * 15;
-  return timeInDeg;
-}
-
-function rotateSun(time = new Date()) {
-  const timeInDeg = timeToDeg(time);
-  document.getElementById(
-    "sun-icon"
-  ).style.transform = `rotate(${timeInDeg}deg) translateY(50px)`;
-}
-
-function tempToColor() {}
-
-function changeBGColor(time) {
-  const timeInRGB = timeToRGB(time);
-  document.querySelector(
-    "html"
-  ).style.background = `radial-gradient(circle at top, rgb(255, ${
-    timeInRGB * 2
-  }, 0), transparent),
-   radial-gradient(circle  at bottom, rgb(0,${timeInRGB}, 255), transparent) rgb(${
-    timeInRGB * 2
-  }, 0, ${255 - timeInRGB})`;
-}
-
-function changeTempColor(temp = 0) {
-  // const colorInDeg = 255 / 100;
-  // const tempInRGB = temp * colorInDeg;
-  // document.querySelector(
-  //   "html"
-  // ).style.background = `radial-gradient(ellipse at top, rgb(255, 255, 0), transparent), radial-gradient(ellipse at bottom, blue, transparent) black`;
-  // `radial-gradient(ellipse at top, rgb(255, ${Math.round(
-  //   tempInRGB / 2
-  // )}, 0), transparent), radial-gradient(ellipse at bottom, blue, transparent) black`;
-}
-
-// const slider = document.getElementById("gradient");
-// slider.addEventListener("input", () => {
-//   // changeBGColor(
-//   //   new Date(
-//   //     `${new Date().getFullYear()}T${
-//   //       slider.value < 10 ? `0${slider.value}` : slider.value
-//   //     }:00`
-//   //   )
-//   // );
-//   // rotateSun(
-//   //   new Date(
-//   //     `${new Date().getFullYear()}T${
-//   //       slider.value < 10 ? `0${slider.value}` : slider.value
-//   //     }:00`
-//   //   )
-//   // );
-// });
-
-// rotateSun(new Date());
-// changeBGColor(new Date());

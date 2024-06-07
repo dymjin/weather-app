@@ -13,10 +13,14 @@ body {
 }
 
 body {
-  background: radial-gradient(ellipse at top left, rgb(39, 80, 78), transparent),
-    radial-gradient(ellipse at top right, rgb(42, 54, 87), transparent),
-    radial-gradient(ellipse at bottom, rgb(17, 17, 34), transparent),
-    rgb(37, 37, 37);
+  background: radial-gradient(
+      ellipse at top left,
+      hsl(225, 20%, 70%),
+      transparent
+    ),
+    radial-gradient(ellipse at top right, hsl(200, 50%, 50%), transparent),
+    radial-gradient(ellipse at bottom, hsl(255, 100%, 20%), transparent),
+    rgb(0, 0, 0);
 }
 
 :root {
