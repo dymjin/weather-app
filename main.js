@@ -307,7 +307,6 @@ function initWeatherDOM(data) {
 }
 
 function addCurrWeatherDOM({ weatherData = {} }) {
-  // console.log(weatherData);
   const currDate = new Date(weatherData.location.localtime);
   const time = `${
     currDate.getHours() < 10 ? `0${currDate.getHours()}` : currDate.getHours()
@@ -404,7 +403,6 @@ function addWeatherDetailsDOM({
   weatherData = {},
   index = 1,
 } = {}) {
-  // console.log(weatherDetails);
   const weatherDays = document.querySelector(".weather-days-container");
   const days = [
     "Sunday",
@@ -557,7 +555,6 @@ async function locationSearchHandler() {
     }`,
     { mode: "cors" }
   );
-  console.log(response);
   const locationData = await response.json();
   removeChildren(locationsList);
   loadingIcon.classList.add("hidden");
@@ -644,6 +641,5 @@ function tempToBGGradient(temp) {
     }, 50%, 50%), transparent),
     radial-gradient(ellipse at bottom, hsl(${tempInColor}, 100%, 20%), transparent),
     hsl(${tempInColor}, ${temp / 2 + 25}%, ${temp}%)`;
-  console.log(tempInBGGradient);
   return tempInBGGradient;
 }
